@@ -42,9 +42,20 @@ last_bullet_time = 0
 bullets = []
 
 # Lives
-heart = pygame.image.load(os.path.join("assets", "images", "heart.png")).convert_alpha()
-heart_rect = heart.get_rect()
+heart_frame_one = pygame.image.load(os.path.join("assets", "images", "hearts", "frame-1.png")).convert_alpha()
+heart_frame_two = pygame.image.load(os.path.join("assets", "images", "hearts", "frame-2.png")).convert_alpha()
+heart_frame_three = pygame.image.load(os.path.join("assets", "images", "hearts", "frame-3.png")).convert_alpha()
+heart_frame_four = pygame.image.load(os.path.join("assets", "images", "hearts", "frame-4.png")).convert_alpha()
+heart_frame_five = pygame.image.load(os.path.join("assets", "images", "hearts", "frame-5.png")).convert_alpha()
+heart_frame_six = pygame.image.load(os.path.join("assets", "images", "hearts", "frame-6.png")).convert_alpha()
+heart_frame_seven = pygame.image.load(os.path.join("assets", "images", "hearts", "frame-7.png")).convert_alpha()
+heart_frame_eight = pygame.image.load(os.path.join("assets", "images", "hearts", "frame-8.png")).convert_alpha()
+heart_frames = [heart_frame_one, heart_frame_two, heart_frame_three, heart_frame_four, heart_frame_five, heart_frame_six, heart_frame_seven, heart_frame_eight]
+heart_rect = heart_frame_one.get_rect()
 heart_rect.bottomleft = (25, 575)
+current_frame = 0
+frame_delay = 200
+last_frame_time = 0
 lives = 3
 
 # Score
@@ -175,6 +186,11 @@ while running:
         if lives < 1:
             game_over = True
 
+        # Heart Animation
+        if current_time - last_frame_time > frame_delay:
+            current_frame = (current_frame + 1) % len(heart_frames)
+            last_frame_time = current_time
+
         # Draw surfaces - reads it from the top down, draws in layers
         screen.blit(background, background_rect_one)
         screen.blit(background, background_rect_two)
@@ -185,7 +201,7 @@ while running:
             screen.blit(bullet_image, bullet_rect)
         screen.blit(spaceship, spaceship_rect)
         screen.blit(score_text, (80, 40))
-        screen.blit(heart, heart_rect)
+        screen.blit(heart_frames[current_frame], heart_rect)
         screen.blit(lives_text, (80, 540))
     else:
         keys = pygame.key.get_pressed()
