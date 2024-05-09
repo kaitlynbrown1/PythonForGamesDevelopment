@@ -92,6 +92,15 @@ title_image = player
 title_image_rect = player.get_rect()
 title_image_rect.center = (WIDTH // 2, HEIGHT // 2)
 
+# Sounds
+boom = pygame.mixer.Sound(os.path.join("assets", "sounds", "boom.mp3"))
+boom.set_volume(0.2)
+shoot = pygame.mixer.Sound(os.path.join("assets", "sounds", "shoot.mp3"))
+shoot.set_volume(0.2)
+pygame.mixer.music.load(os.path.join("assets", "sounds", "xeon6.ogg"))
+pygame.mixer.music.set_volume(0.2)
+pygame.mixer.music.play()
+
 # Main game loop
 game_over = True
 running = True
@@ -129,6 +138,7 @@ while running:
             bullet_rect.center = player_rect.center
             bullets.append((bullet_image, bullet_rect))
             last_bullet_time = current_time
+            shoot.play()
 
         # MOVE Bullets
         for bullet_image, bullet_rect in bullets:
@@ -145,12 +155,13 @@ while running:
             if player_rect.colliderect(enemy_rect):
                 lives -= 1
                 enemies.remove((enemy_image, enemy_rect))
+                boom.play()
             for bullet_image, bullet_rect in bullets:
                 if bullet_rect.colliderect(enemy_rect) and enemy_rect.right < WIDTH:
                     enemies.remove((enemy_image, enemy_rect))
                     bullets.remove((bullet_image, bullet_rect))
                     score += 1
-                    print(score)
+                    boom.play()
 
         # Spawn Enemies
         if current_time - last_enemy_time > spawn_enemy:
