@@ -41,6 +41,19 @@ bullet_cooldown = 800
 last_bullet_time = 0
 bullets = []
 
+# Lives
+heart = pygame.image.load(os.path.join("assets", "images", "heart.png")).convert_alpha()
+heart_rect = heart.get_rect()
+heart_rect.bottomleft = (25, 575)
+lives = 3
+
+# Score
+spaceship = pygame.image.load(os.path.join("assets", "images", "spaceship.png")).convert_alpha()
+spaceship_rect = spaceship.get_rect()
+spaceship_rect.topleft = (25, 25)
+score = 0
+info_font = pygame.font.Font(os.path.join("assets", "fonts", "LuckiestGuy-Regular.ttf"), 32)
+
 # Enemies
 enemy_one = pygame.image.load(os.path.join("assets", "images", "spaceship_en_one.png")).convert_alpha() # use alpha if the background is transparent
 enemy_two = pygame.image.load(os.path.join("assets", "images", "spaceship_en_two.png")).convert_alpha()
@@ -119,11 +132,14 @@ while running:
         # Collision Detection
         for enemy_image, enemy_rect in enemies:
             if player_rect.colliderect(enemy_rect):
-                game_over = True
+                lives -= 1
+                enemies.remove((enemy_image, enemy_rect))
             for bullet_image, bullet_rect in bullets:
-                if bullet_rect.colliderect(enemy_rect):
+                if bullet_rect.colliderect(enemy_rect) and enemy_rect.right < WIDTH:
                     enemies.remove((enemy_image, enemy_rect))
                     bullets.remove((bullet_image, bullet_rect))
+                    score += 1
+                    print(score)
 
         # Spawn Enemies
         if current_time - last_enemy_time > spawn_enemy:
@@ -139,7 +155,25 @@ while running:
                 enemy_rect.y = (HEIGHT - enemy_rect.height)
             enemies.append((enemy_image, enemy_rect)) # append = add something to a list
             last_enemy_time = current_time
-            print(enemies)
+
+        # Score and Lives
+        score_text = info_font.render(f"{score}", True, "white") # f - formated string, pass variable in {}, the value held goes directly into the string    
+        if score > 5:
+            spawn_enemy = 2500
+        if score > 10:
+            spawn_enemy = 2000
+        if score > 15:
+            spawn_enemy = 1500
+        if score > 20:
+            spawn_enemy = 1000
+        
+       # if score % 5 == 0:
+       #     spawn_enemy -= 500 
+
+
+        lives_text = info_font.render(f"{lives}", True, "white")
+        if lives < 1:
+            game_over = True
 
         # Draw surfaces - reads it from the top down, draws in layers
         screen.blit(background, background_rect_one)
@@ -149,6 +183,10 @@ while running:
             screen.blit(enemy_image, enemy_rect)
         for bullet_image, bullet_rect in bullets:
             screen.blit(bullet_image, bullet_rect)
+        screen.blit(spaceship, spaceship_rect)
+        screen.blit(score_text, (80, 40))
+        screen.blit(heart, heart_rect)
+        screen.blit(lives_text, (80, 540))
     else:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RETURN]:
@@ -156,6 +194,8 @@ while running:
             enemies.clear()
             bullets.clear()
             player_rect.midleft = (25, HEIGHT // 2)
+            lives = 3
+            score = 0
         screen.fill("black")
         screen.blit(title_text, title_rect)
         screen.blit(inst_text, inst_rect)
